@@ -461,9 +461,24 @@ namespace LitJson
                             }
                         }
 
-                        ((IDictionary) instance).Add (
-                            property, ReadValue (
-                                t_data.ElementType, reader));
+                        bool bDict = false;
+                        if(instance is IDictionary)
+                        {
+                            Type[] KeyValueType = instance.GetType().GetGenericArguments();
+                            if (KeyValueType != null && KeyValueType.Length == 2)
+                            {
+                                // 如果是Dictionary<Key, Value>，那么
+                                bDict = true;
+                                object objKey = Convert.ChangeType(reader.Value, KeyValueType[0]);
+                                ((IDictionary)instance).Add(objKey, ReadValue(KeyValueType[1], reader));
+                            }
+                        }
+                        if (!bDict)
+                        {
+                            ((IDictionary) instance).Add (
+                                property, ReadValue (
+                                    t_data.ElementType, reader));
+                        }
                     }
 
                 }
@@ -755,7 +770,8 @@ namespace LitJson
             if (obj is IDictionary) {
                 writer.WriteObjectStart ();
                 foreach (DictionaryEntry entry in (IDictionary) obj) {
-                    writer.WritePropertyName ((string) entry.Key);
+                    //writer.WritePropertyName ((string) entry.Key);
+                    writer.WritePropertyName(entry.Key.ToString());
                     WriteValue (entry.Value, writer, writer_is_private,
                                 depth + 1);
                 }

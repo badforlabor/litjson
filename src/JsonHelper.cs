@@ -20,8 +20,8 @@ namespace SHGame
     {
         static public T loadObjectFromJsonFile<T>(string path)
         {
-            try
-            {
+//             try
+//             {
                 TextReader reader = new StreamReader(path);
                 if (reader == null)
                 {
@@ -39,11 +39,11 @@ namespace SHGame
                 reader.Close();
 
                 return data;
-            }
-            catch (System.Exception e)
-            {
-                return default(T);
-            }
+//             }
+//             catch (System.Exception e)
+//             {
+//                 return default(T);
+//             }
 
         }
 
