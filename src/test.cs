@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Drawing;
 
 namespace SHGame
 {
@@ -15,7 +16,13 @@ namespace SHGame
         public int Age { get; set; }
         public DateTime Birthday { get; set; }
     }
-
+    public class Person2
+    {
+        // 当然也支持普通变量
+        public string Name;
+        public int Age;
+        public DateTime Birthday;
+    }
     public class PersonGroup
     {
         public Dictionary<int, Person> Dict;
@@ -34,6 +41,8 @@ namespace SHGame
 
             PersonGroupToJson();
             JsonToPersonGroup();
+
+            ComplexClassToJson();
 
             Console.WriteLine("按任意键继续...");
             Console.ReadKey();
@@ -89,6 +98,31 @@ namespace SHGame
             Person thomas = JsonHelper.loadObjectFromJsonFile<Person>("./test.txt");
 
             Console.WriteLine("Thomas' age: {0}", thomas.Age);
+        }
+
+        public static void ComplexClassToJson()
+        {
+            // case 1
+            {
+                // 自定义导出类型
+                JsonMapper.AddCustomTypeProperties(typeof(Rectangle), "X", "Y", "Width", "Height");
+
+                Rectangle rect = new Rectangle(5, 10, 20, 30);
+                JsonHelper.saveObjectToJsonFile(rect, "./rect.txt");
+                Rectangle rect2 = JsonHelper.loadObjectFromJsonFile<Rectangle>("./rect.txt");
+                JsonHelper.saveObjectToJsonFile(rect2, "./rect.txt");
+            }
+
+            // case 2
+            {
+                Person2 p2 = new Person2();
+                p2.Name = "p2";
+                p2.Age = 13;
+                p2.Birthday = DateTime.Now;
+                JsonHelper.saveObjectToJsonFile(p2, "./p2.txt");
+                Person2 p22 = JsonHelper.loadObjectFromJsonFile<Person2>("./p2.txt");
+                JsonHelper.saveObjectToJsonFile(p22, "./p2.txt");
+            }
         }
     }
 }

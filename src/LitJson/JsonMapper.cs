@@ -244,7 +244,52 @@ namespace LitJson
                 }
             }
         }
+        // 支持自定义属性导出
+        public static void AddCustomTypeProperties(Type type, params string[] includeTypes)
+        {
+            if (type_properties.ContainsKey(type))
+                return;
+            if (includeTypes == null || includeTypes.Length == 0)
+                return;
 
+            IList<PropertyMetadata> props = new List<PropertyMetadata>();
+            foreach (var it in includeTypes)
+            {
+                PropertyInfo p_info = type.GetProperty(it);
+                if (p_info == null || p_info.Name == "Item")
+                    continue;
+
+                PropertyMetadata p_data = new PropertyMetadata();
+                p_data.Info = p_info;
+                p_data.IsField = false;
+                props.Add(p_data);
+            }
+            foreach (var it in includeTypes)
+            {
+                FieldInfo f_info = type.GetField(it);
+                if (f_info == null)
+                    continue;
+
+                PropertyMetadata p_data = new PropertyMetadata();
+                p_data.Info = f_info;
+                p_data.IsField = true;
+
+                props.Add(p_data);
+            }
+
+
+            lock (type_properties_lock)
+            {
+                try
+                {
+                    type_properties.Add(type, props);
+                }
+                catch (ArgumentException)
+                {
+                    return;
+                }
+            }
+        }
         private static void AddTypeProperties (Type type)
         {
             if (type_properties.ContainsKey (type))
