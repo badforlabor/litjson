@@ -244,7 +244,7 @@ namespace LitJson
                 }
             }
         }
-        // ÷ß≥÷◊‘∂®“Â Ù–‘µº≥ˆ
+        // ÊîØÊåÅËá™ÂÆö‰πâÂ±ûÊÄßÂØºÂá∫
         public static void AddCustomTypeProperties(Type type, params string[] includeTypes)
         {
             if (type_properties.ContainsKey(type))
@@ -411,7 +411,23 @@ namespace LitJson
                 if (conv_op != null)
                     return conv_op.Invoke (null,
                                            new object[] { reader.Value });
-
+#if true
+                if ((inst_type == typeof(float)) && (json_type == typeof(double)))
+                {
+                    double v = (double) reader.Value;
+                    return (float) v;
+                }
+                if ((inst_type == typeof(byte)) && (json_type == typeof(int)))
+                {
+                    int v = (int) reader.Value;
+                    return (byte) v;
+                }
+                if (inst_type == typeof(short) && json_type == typeof(int))
+                {
+                    int v = (int) reader.Value;
+                    return (short) v;
+                }
+#endif
                 // No luck
                 throw new JsonException (String.Format (
                         "Can't assign value '{0}' (type {1}) to type {2}",
@@ -512,7 +528,7 @@ namespace LitJson
                             Type[] KeyValueType = instance.GetType().GetGenericArguments();
                             if (KeyValueType != null && KeyValueType.Length == 2)
                             {
-                                // »Áπ˚ «Dictionary<Key, Value>£¨ƒ«√¥
+                                // Â¶ÇÊûúÊòØDictionary<Key, Value>ÔºåÈÇ£‰πà
                                 bDict = true;
                                 object objKey = Convert.ChangeType(reader.Value, KeyValueType[0]);
                                 ((IDictionary)instance).Add(objKey, ReadValue(KeyValueType[1], reader));
@@ -792,6 +808,27 @@ namespace LitJson
                 return;
             }
 
+#if true
+            if (obj is float)
+            {
+                double v = (float) obj;
+                writer.Write(v);
+                return;
+            }
+            if (obj is byte)
+            {
+                int v = (byte) obj;
+                writer.Write(v);
+                return;
+            }
+            if (obj is short)
+            {
+                int v = (short) obj;
+                writer.Write(v);
+                return;
+            }
+#endif
+
             if (obj is Array) {
                 writer.WriteArrayStart ();
 
@@ -857,6 +894,12 @@ namespace LitJson
                 return;
             }
 
+#if true
+            if (obj.GetType().IsPrimitive)
+            {
+                throw new Exception(string.Format("unknown type [{0}]", obj.GetType()));
+            }
+#endif
             // Okay, so it looks like the input should be exported as an
             // object
             AddTypeProperties (obj_type);
