@@ -49,22 +49,24 @@ namespace SHGame
 
         static public void saveObjectToJsonFile(object data, string path)
         {
-            TextWriter tw = new StreamWriter(path);
-            if (tw == null)
-            {
-                Debug.LogError("Cannot write to " + path);
-                return;
-            }
-
 #if PRETTY_FORMATER
             string jsonStr = JsonFormatter.PrettyPrint(ToJson(data));
 #else
             string jsonStr = JsonMapper.ToJson(data);
 #endif
-            tw.Write(jsonStr);
-            tw.Flush();
-            tw.Close();
+            string dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            File.WriteAllText(path, jsonStr);
         }
+
+        public static string ToPrettyJson(object obj)
+        {
+            return JsonFormatter.PrettyPrint(ToJson(obj));
+        }
+
         public static string ToJson(object obj)
         {
             return JsonMapper.ToJson(obj);
@@ -73,6 +75,11 @@ namespace SHGame
         {
             return JsonMapper.ToObject<T>(json);
         }
+        public static object CommonToObject(Type t, string json)
+        {
+            return JsonMapper.CommonToObject(t, json);
+        }
+
 	
 	
     }

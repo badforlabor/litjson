@@ -244,7 +244,7 @@ namespace LitJson
                 }
             }
         }
-        // æ”¯æŒè‡ªå®šä¹‰å±æ€§å¯¼å‡º
+        // Ö§³Ö×Ô¶¨ÒåÊôĞÔµ¼³ö
         public static void AddCustomTypeProperties(Type type, params string[] includeTypes)
         {
             if (type_properties.ContainsKey(type))
@@ -528,7 +528,7 @@ namespace LitJson
                             Type[] KeyValueType = instance.GetType().GetGenericArguments();
                             if (KeyValueType != null && KeyValueType.Length == 2)
                             {
-                                // å¦‚æœæ˜¯Dictionary<Key, Value>ï¼Œé‚£ä¹ˆ
+                                // Èç¹ûÊÇDictionary<Key, Value>£¬ÄÇÃ´
                                 bDict = true;
                                 object objKey = Convert.ChangeType(reader.Value, KeyValueType[0]);
                                 ((IDictionary)instance).Add(objKey, ReadValue(KeyValueType[1], reader));
@@ -980,6 +980,13 @@ namespace LitJson
             JsonReader reader = new JsonReader (json);
 
             return (T) ReadValue (typeof (T), reader);
+        }
+
+        public static object CommonToObject(Type t, string json)
+        {
+            JsonReader reader = new JsonReader (json);
+
+            return ReadValue (t, reader);
         }
 
         public static IJsonWrapper ToWrapper (WrapperFactory factory,
